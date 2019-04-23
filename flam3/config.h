@@ -5,7 +5,7 @@
 #define HAVE_DLFCN_H 1
 
 /* Have 64-bit __sync_bool_compare_and_swap() and friends. */
-#define HAVE_GCC_64BIT_ATOMIC_OPS 1
+/* #undef HAVE_GCC_64BIT_ATOMIC_OPS */
 
 /* Have 32-bit __sync_bool_compare_and_swap() and friends. */
 #define HAVE_GCC_ATOMIC_OPS 1

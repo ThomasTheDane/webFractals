@@ -1,0 +1,123 @@
+<script src="/flam3/flam3-render.js"></script>
+<script>
+    Module.onRuntimeInitialized = () => {
+        let flamePaletts = `<palettes>
+                            <palette number="0" name="south-sea-bather" data="00b9eaeb00c1eeeb00c5f2eb00c9f2eb00c9f6eb00cdf6eb00cdf6eb00cdf2eb
+                            00d1f2eb00d2eeeb00d1f2e100d6f2eb00ddf6fe00d5f2f400f2faf400e2f2eb
+                            00def2eb00d6f2eb00d6f2f400d1eef400d1eef400cdeef400cdeeeb00c9eeeb
+                            00c9eeeb00c9eef400c9eef400c9f2f400cdf2f400d1f2f400d2f2f400d1f6f4
+                            00cdf2f400c5f2f400bdf2f400bdf2f400b9eef400b5f2f400bdf2f400c1f2f4
+                            00c5f2fe00c5f2fe00bdf2f400b5f2f400b1f2f400b5eef400bdeaeb00bdeaeb
+                            00c1e6eb00c1e6eb00bde6e100b5e6e100a5e6e100a5e2e100a1e2eb009de6ea
+                            0099def400a5e2f400a5e6f400a5e6f400a9e2f400ade2eb00b1e2eb00b1deeb
+                            00b1e2eb00b1e6f400b1e2f400b1e2f400b1e2f400ade2f400a9e2f400a1e6fe
+                            009de6fe00a5eaf400adeaf400b1eeea00b9eeeb00c1eeeb00c5eeeb00c5eeeb
+                            00c9eeeb00c9f2f400c5f2f400c5eef400c5eaf400c5eaf400c5eaf400c1e6eb
+                            00c1e6eb00c5eae100c5e6e200c2e2cf00ce9b8400b27f7100a6845500918055
+                            009a805500a2725500a2764b00b6724b00ba7f6700d2a48400c6e2c600c9eae1
+                            00ceeed800deab8300ce9b7a00be907a00ca977a00dba38400e6b79600fae9ce
+                            00deeaeb00d1eeeb00c1e2eb00bddeeb00b5deeb00ade2f400a9e2f400a9e2f4
+                            00ade6f400adeaeb00adeaea00ade6eb00ade2eb00ade2ea00b1e6e200b5e6e2
+                            00bde6eb00c1e6f400c5eaf400c9eaf400c9eef400c9eef400c9eef400c9eef4
+                            00c9eef400c9f2f400c9f2f400c9f2f400c9f2f400c9f2f400c5eef400c1eefe
+                            00b1eefe00ade6f400b1e6f400b1eaf400b5eef400bdeef400c1f2f400c9f6f4
+                            00cdf6f400cdf6f400cdf6f400cdf2f400cdeef400cdeefe00c9eefe00c5eefe
+                            00c1eef400c1eef400c1eaf400c1eaeb00c1eaeb00c1eaeb00bdeaf400b9eaf4
+                            00b5eaf400b5e6f400b5e6f400b5eaf400bdeaf400c1eaf400c5eaeb00c5eaeb
+                            00c9eaeb00c9eaf400cdeaf400cdeef400cdeef400cdeef400cdf2f400c9f2eb
+                            00c9f2eb00c5f2eb00c1eaf400b9e6f400b5e2f400b5e2f400b5e6f400b5e6f4
+                            00b9eaeb00bdeeeb00bdf2eb00c1eeeb00c5eeeb00c5eeeb00c5eee100c1eae1
+                            00bdded800aa94710075684200483725000b0c0900242c25004c7567009e9171
+                            00b1cec500bde2d800bdeae200c1eeeb00bdeef400bdeef400bdeef400b9eaf4
+                            00b9eaf400b9e6f400bde6eb00bde6eb00bdeaf400c1eef400c5f2fe00c9f6fe
+                            00c9f2fe00c5eefe00c1eef400bdeeeb00b9eaeb00b1e6ea00b5e6eb00b5e6eb
+                            00b9e2eb00b5e6eb00bde6eb00c1eaeb00c1eaf400bdeaf400b9e6f400b5e6f4
+                            00b1e6f400b1e6eb00a9e2eb00a9e2eb00a1dee10089bec5009e917a00957c67
+                            00857967008d6a4b008d5f420085634200796c420079643800756841005d5938
+                            "/>
+                            <palette number="1" name="sky-flesh" data="00a6947a00dba28400eed4b200faedce00eefaeb00e2f2eb00daf2e100cef2e1
+                            00ceeee100ceeacf00b6a98d00b28a6700b2826700aa937100b1c6b300b5e6e1
+                            00b9e6eb00bde6f400c5e6f400c9eaf400cdeaf400cdeef400c9eaeb00c5eae1
+                            00c1decf00aa947a00917f5e00756442003c402f0014241c0008140900141c12
+                            00383c2500715b3800916a4b00a6795500be896700e6bea900dae6e200d6eeeb
+                            00d1eef400cdeef400cdeef400c9eef400c5eaf400c5eaf400c5e6f400c5e6f4
+                            00c5e6f400c1eaf400b9e6f400b1e2eb009dcece0078998d00608584006c8d8d
+                            008db1b200ade2e100b1e6eb00b9eaeb00b9f2f400c5f2f400c5eef400c5eef4
+                            00c5eef400c1eaf400bde6eb00b9d6c5009a907a00967f5e009280550085734b
+                            0085784b007d6b4b007d705500856f4b008d654200816a4b00896a4200856642
+                            008d5b42008d5d3800895d2f00755725006d4a2500382c1c000c140900041000
+                            000c1c0900342f1c00504c2f00715b3800795e38007d62380071572500553f1c
+                            00282c1c000c0c0900000c0000041809001c3c250038584b0079685400918467
+                            00aaa08400c1e2cf00c5eee100cdf2eb00cdf2f400cdeef400c9eef400c9eef4
+                            00c9eef400c5eef400c1eaf400bde6eb00bde2e100babd9700ba966700a6875e
+                            00a6865e00a2825e00a2825e00a6825500a28255009e7e4b0096764b009e714b
+                            00967542009a75420095724b009e835500a68b5500ae8e5500b69b7100c6c2a9
+                            00cde6d800cdeaeb00c5def400c1e2f400b9e6f400b5e2f400b1e2e20091a5a0
+                            009e9067009e905e00a68f5e00baa07a00c5decf00cae2e200c9eaeb00c5eaeb
+                            00c1eef400bdeaf400ade2f400addeeb00899da00089787100817c67008d845e
+                            009e7e5e00aa8f7100b2b9a000b9e6e100bde6eb00c1eaeb00c1eaeb00c1eae1
+                            00b6c2aa00a290710092775500715c4200444025001820090000100900000c09
+                            000c101200382f1c0071532e00855a3800966c38009a6d42009e684200996438
+                            00a55f2f009e672f009e6c38009e6842009d6e4b009e684b00a2714b00a26c4b
+                            009e714200aa704200ae744b00b67c4b00ae784b00b67c5500be8e6700d6c0a9
+                            00d2e6e100d6eaeb00d6eaeb00d2eaeb00d1eaeb00cdeaeb00cdeeeb00caeeeb
+                            00c5eeeb00c5eeeb00c5eeeb00c5eeeb00c9eeeb00caeeeb00cdeeeb00cdeeeb
+                            00d2f2eb00d6f2eb00d6eee100d2eae200c6d2bc00b2977a009e7367007d6b55
+                            005c615e00304c42000c181c00080c120004080900101c120038382500644b38
+                            0085624200926e55009a7b5e009e8c6700b2b18d00b9e6d800c1eaeb00c5eaeb
+                            00ceeae100ceeacf00d6a28400be895e00b27d5e00aa7b5e00aa7d5e00a68771
+                            00b2a88d00b9e2cf00b5e6eb00b9e6f400b9e6f400b5e2eb00bed2c600aa9871
+                            "/>]
+                            </palettes>
+                            `;
+
+        let flameInput = `<test>
+                        <flame time="0" palette="0" size="640 480" center="0 0" scale="240" zoom="0" oversample="1" filter="1" quality="10" background="0 0 0" brightness="4" gamma="4" vibrancy="1" hue="0.22851">
+                        <xform weight="0.25" color="1" spherical="1" coefs="-0.681206 -0.0779465 0.20769 0.755065 -0.0416126 -0.262334"/>
+                        <xform weight="0.25" color="0.66" spherical="1" coefs="0.953766 0.48396 0.43268 -0.0542476 0.642503 -0.995898"/>
+                        <xform weight="0.25" color="0.33" spherical="1" coefs="0.840613 -0.816191 0.318971 -0.430402 0.905589 0.909402"/>
+                        <xform weight="0.25" color="0" spherical="1" coefs="0.960492 -0.466555 0.215383 -0.727377 -0.126074 0.253509"/>
+                        </flame>
+                        <flame time="100" palette="1" size="640 480" center="0 0" scale="240" zoom="0" oversample="1" filter="1" quality="10" background="0 0 0" brightness="4" gamma="4" vibrancy="1" hue="0.147038">
+                        <xform weight="0.25" color="1" spherical="1" coefs="-0.357523 0.774667 0.397446 0.674359 -0.730708 0.812876"/>
+                        <xform weight="0.25" color="0.66" spherical="1" coefs="-0.69942 0.141688 -0.743472 0.475451 -0.336206 0.0958816"/>
+                        <xform weight="0.25" color="0.33" spherical="1" coefs="0.0738451 -0.349212 -0.635205 0.262572 -0.398985 -0.736904"/>
+                        <xform weight="0.25" color="0" spherical="1" coefs="0.992697 0.433488 -0.427202 -0.339112 -0.507145 0.120765"/>
+                        </flame>
+                        </test>
+                        `
+
+        FS.writeFile("/test.flam3", flameInput)
+        FS.mkdir("usr");
+        FS.mkdir("usr/local");
+        FS.mkdir("usr/local/share");
+        FS.mkdir("usr/local/share/flam3");
+        FS.writeFile("/usr/local/share/flam3/flam3-palettes.xml", flamePaletts)
+
+        const api = {
+            test: Module.cwrap('test', 'number', []),
+        };
+        console.log(api.test());
+    };
+
+    setTimeout(function () {
+        let pngBuffer = FS.readFile("00000.png");
+        let blob = new Blob([pngBuffer], {type: "image/png"})
+        const imageUrl = URL.createObjectURL(blob);
+        const img = document.querySelector('img');
+        document.querySelector('img').src = imageUrl;
+        
+        
+        console.log(pngBuffer)
+        console.log(imageUrl);
+        // img.addEventListener('load', () => URL.revokeObjectURL(imageUrl));
+
+        // const canvas = document.createElement('canvas');
+        // document.body.appendChild(canvas);
+        // const context = canvas.getContext('2d');
+        // let clamped = new Uint8ClampedArray(pngData);
+        // let imageData = new ImageData(clamped, 640, 480);
+        // context.putImageData(pngData, 0, 0);
+    }, 1000)
+</script>
+<img />

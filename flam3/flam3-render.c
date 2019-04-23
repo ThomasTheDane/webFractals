@@ -16,6 +16,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "emscripten.h"
+
+
 #ifdef WIN32
 #define WINVER 0x0500
 #include <windows.h>
@@ -105,6 +108,11 @@ int print_progress(void *foo, double fraction, int stage, double eta) {
   return 0;
 }
 
+EMSCRIPTEN_KEEPALIVE
+int test(){
+   return 41;
+}
+
 int main(int argc, char **argv) {
    flam3_frame f;
    char *ai;
@@ -123,11 +131,12 @@ int main(int argc, char **argv) {
    char *prefix = args("prefix", "");
    char *out = args("out", NULL);
    char *format = getenv("format");
-   int verbose = argi("verbose", 1);
+   int verbose = 1; //argi("verbose", 1); //set verbose to 1
    int bits = argi("bits", 33);
    int bpc = argi("bpc",8);
    int transparency = argi("transparency", 0);
-   char *inf = getenv("in");
+   // char *inf = getenv("in"); 
+   char *inf = "test.flam3"; // replace getting file input with just passing file name we create on js side 
    double qs = argf("qs", 1.0);
    double ss = argf("ss", 1.0);
    double pixel_aspect = argf("pixel_aspect", 1.0);
@@ -145,24 +154,24 @@ int main(int argc, char **argv) {
    char badval_string[64];
    char rtime_string[64];
 
-#ifdef WIN32
+// // #ifdef WIN32
    
-   char *slashloc;
-   char exepath[256];
-   char palpath[256];
-   memset(exepath,0,256);
-   memset(palpath,0,256); 
+// //    char *slashloc;
+// //    char exepath[256];
+// //    char palpath[256];
+// //    memset(exepath,0,256);
+// //    memset(palpath,0,256); 
 
-    slashloc = strrchr(argv[0],'\\');
-	if (NULL==slashloc) {
-	   sprintf(palpath,"flam3_palettes=flam3-palettes.xml");
-	} else {
-       strncpy(exepath,argv[0],slashloc-argv[0]+1);
-	   sprintf(palpath,"flam3_palettes=%sflam3-palettes.xml",exepath);
-	}
-	putenv(palpath);
+// //     slashloc = strrchr(argv[0],'\\');
+// // 	if (NULL==slashloc) {
+// // 	   sprintf(palpath,"flam3_palettes=flam3-palettes.xml");
+// // 	} else {
+// //        strncpy(exepath,argv[0],slashloc-argv[0]+1);
+// // 	   sprintf(palpath,"flam3_palettes=%sflam3-palettes.xml",exepath);
+// // 	}
+// // 	putenv(palpath);
 
-#endif         
+// // #endif         
    
    
    if (1 != argc) {
@@ -184,7 +193,7 @@ int main(int argc, char **argv) {
          fprintf(stderr,"Manually specified %d thread(s)...\n",num_threads);
    }
 
-
+// checks getenv("format") for format and default to png
    if (NULL == format) format = "png";
    if (strcmp(format, "jpg") &&
        strcmp(format, "ppm") &&
@@ -195,6 +204,7 @@ int main(int argc, char **argv) {
        exit(1);
    }
 
+// Gets the channel 
    channels = strcmp(format, "png") ? 3 : 4;
 
    /* Check for 16-bit-per-channel processing */
@@ -212,6 +222,7 @@ int main(int argc, char **argv) {
      exit(1);
    }
 
+// If there is a file found from getenv("in") then open that and read, else read stdin
    if (inf)
      in = fopen(inf, "rb");
    else
@@ -221,15 +232,21 @@ int main(int argc, char **argv) {
      exit(1);
    }
 
+   // "in" is a FILE object 
+   // "cps" is a flam3_genome struct 
+   // No mention in this file of flam3_defaults_on
+   // ncps is some kind of int pointer but can't tell for what 
    cps = flam3_parse_from_file(in, inf, flam3_defaults_on, &ncps);
    if (NULL == cps) {
      fprintf(stderr,"error reading genomes from file\n");
      exit(1);
    }
    
+   // If we had inf FILE then close it now that we're done reading 
    if (inf)
       fclose(in);
 
+// This seems like setup for the flam3_gnome object
    for (i = 0; i < ncps; i++) {
       /* Force ntemporal_samples to 1 for -render */
       cps[i].ntemporal_samples = 1;
@@ -243,11 +260,13 @@ int main(int argc, char **argv) {
       }
    }
 
+   // Just a warning for multiple images 
    if (out && (ncps > 1)) {
       fprintf(stderr, "hqi-flame: warning: writing multiple images "
       "to one file.  all but last will be lost.\n");
    }
 
+// Now it seems like ncps might not be pointer but instead number of fractals 
    for (i = 0; i < ncps; i++) {
       int real_height;
 
@@ -255,7 +274,7 @@ int main(int argc, char **argv) {
          fprintf(stderr, "flame = %d/%d ", i+1, ncps);
       }
 
-//      f.temporal_filter_radius = 0.0;
+//      f.temporal_filter_radius = 0.0; //this was commented out in original 
       f.genomes = &cps[i];
       f.ngenomes = 1;
       f.verbose = verbose;
@@ -266,7 +285,7 @@ int main(int argc, char **argv) {
       f.nthreads = num_threads;
       f.earlyclip = earlyclip;
       f.sub_batch_size = sub_batch_size;
-      
+
       if (16==bpc)
          f.bytes_per_channel = 2;
       else
@@ -373,6 +392,7 @@ int main(int argc, char **argv) {
          sprintf(rtime_string,"%d",stats.render_seconds);
          fpc.rtime = rtime_string;
 
+         // format = "jpg"; //force set to jpeg 
          if (!strcmp(format, "png")) {
 
              write_png(fp, image, cps[i].width, real_height, &fpc, f.bytes_per_channel);            
@@ -402,7 +422,8 @@ int main(int argc, char **argv) {
       if (verbose) {
          fprintf(stderr, "done.\n");
       }
-   }
+   } //end of for loop
+
    if (verbose && ((ncps > 1) || (nstrips > 1))) {
       long total_time = (long)time(0) - start_time;
 

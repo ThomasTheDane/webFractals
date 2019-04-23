@@ -267,7 +267,7 @@ CC = /Users/nattestad/workspaces/emsdk/emscripten/1.38.30/emcc
 CCDEPMODE = depmode=none
 CFLAGS = 
 CPP = /Users/nattestad/workspaces/emsdk/emscripten/1.38.30/emcc -E
-CPPFLAGS = -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/usr/include/libxml2 -s USE_LIBPNG=1 -I /Users/nattestad/workspaces/webFractals/flam3/../libjpeg
+CPPFLAGS = -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/usr/include/libxml2 -I/Users/nattestad/workspaces/webFractals/libjpeg -s USE_LIBPNG=1
 CYGPATH_W = echo
 DEFS = -DHAVE_CONFIG_H
 DEPDIR = .deps
@@ -287,7 +287,7 @@ INSTALL_PROGRAM = ${INSTALL}
 INSTALL_SCRIPT = ${INSTALL}
 INSTALL_STRIP_PROGRAM = $(install_sh) -c -s
 LD = /Users/nattestad/workspaces/emsdk/emscripten/1.38.30/emcc
-LDFLAGS = -s USE_ZLIB=1 -s USE_LIBPNG=1 -s -L/Users/nattestad/workspaces/webFractals/flam3/../libxml2/.libs/ -L/Users/nattestad/workspaces/webFractals/flam3/../libjpeg/.libs
+LDFLAGS = -s USE_ZLIB=1 -s USE_LIBPNG=1 -L/Users/nattestad/workspaces/webFractals/libjpeg/.libs -L/Users/nattestad/workspaces/webFractals/libxml2/.libs
 LIBOBJS = 
 LIBS = -ljpeg -lpthread -lxml2 -lpng -lz 
 LIBTOOL = $(SHELL) $(top_builddir)/libtool
