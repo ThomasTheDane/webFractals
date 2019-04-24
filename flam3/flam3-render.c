@@ -115,6 +115,7 @@ int test(){
 
 flam3_frame f;
 void *image=NULL;
+size_t this_size, last_size = -1;
 
 int main(int argc, char **argv) {
    char *ai;
@@ -123,7 +124,6 @@ int main(int argc, char **argv) {
    int i;
    FILE *fp;
    char fname[256];
-   size_t this_size, last_size = -1;
    double imgmem;
    unsigned int strip;
    double center_y, center_base;
@@ -356,7 +356,7 @@ int main(int argc, char **argv) {
       // iterate through strips, though note that nstrips is 1 in test cases 
       for (strip = 0; strip < nstrips; strip++) {
          size_t ssoff = (size_t)cps[i].height * strip * cps[i].width * channels * f.bytes_per_channel;
-         void *strip_start = image + ssoff;
+         void *strip_start = image + ssoff; // When only 1 strip, this is the same pointer as image because ssoff is 0
          cps[i].center[1] = center_base + cps[i].height * (double) strip / (cps[i].pixels_per_unit * zoom_scale);
          
          if ((cps[i].height * (strip + 1)) > real_height) {
@@ -377,11 +377,30 @@ int main(int argc, char **argv) {
             fprintf(stderr, "\n");
          }
          cps[i].ntemporal_samples = 1;
+ 
+         // lets add some print statements!
+         fprintf(stderr, "\n Start debug info \n\n");
+         fprintf(stderr, "genomes.num_xforms : %d\n", f.genomes->num_xforms);
+         fprintf(stderr, "genomes.genome_index : %d\n", f.genomes->genome_index);
+         fprintf(stderr, "genomes.palette_index : %d\n", f.genomes->palette_index);
+         fprintf(stderr, "genomes.width : %d\n", f.genomes->width);
+         fprintf(stderr, "genomes.sample_density : %f\n", f.genomes->sample_density);
+         fprintf(stderr, "genomes.contrast : %f\n", f.genomes->contrast);
+         fprintf(stderr, "genomes.gamma : %f\n", f.genomes->gamma);
          //call that actually goes and renders the strip (which is the whole picture when nstrips = 1)
          if (flam3_render(&f, strip_start, flam3_field_both, channels, transparency, &stats)) { 
             fprintf(stderr,"error rendering image: aborting.\n");
             exit(1);
          }
+
+         for(int xi = 0; xi < 80; xi += 8){
+            fprintf(stderr, "data at mem index %ld: %ld\n",((long)strip_start) + xi, *(((long *)strip_start) + xi));
+         }
+         fprintf(stderr, "\n end debug info\n\n");
+
+
+         // want to inspect the output a bit immediately
+
 
          if (NULL != out) {
             strcpy(fname,out);
@@ -457,7 +476,16 @@ int main(int argc, char **argv) {
    }
    free(cps);
    
-   free(image); // don't free image O.o sneaky sneaky 
+   // free(image); // maybe don't free image O.o sneaky sneaky 
    return 0;
 }
 
+EMSCRIPTEN_KEEPALIVE
+int get_image_pointer(){
+   return (int)image;
+}
+
+EMSCRIPTEN_KEEPALIVE
+int get_image_size(){
+   return (int)this_size;
+}

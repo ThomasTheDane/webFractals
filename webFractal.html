@@ -1,5 +1,6 @@
 <script src="/flam3/flam3-render.js"></script>
 <script>
+    let api;
     Module.onRuntimeInitialized = () => {
         let flamePaletts = `<palettes>
                             <palette number="0" name="south-sea-bather" data="00b9eaeb00c1eeeb00c5f2eb00c9f2eb00c9f6eb00cdf6eb00cdf6eb00cdf2eb
@@ -103,26 +104,36 @@
         FS.mkdir("usr/local/share/flam3");
         FS.writeFile("/usr/local/share/flam3/flam3-palettes.xml", flamePaletts)
 
-        const api = {
+        api = {
             test: Module.cwrap('test', 'number', []),
+            getImagePointer: Module.cwrap('get_image_pointer', 'number', []),
+            getImageSize: Module.cwrap('get_image_size', 'number', [])
         };
         console.log(api.test());
     };
 
     setTimeout(function () {
-        let pngBuffer = FS.readFile("00000.jpg");
-        let blob = new Blob([pngBuffer], {type: "image/jpg"})
-        const imageUrl = URL.createObjectURL(blob);
-        const img = document.querySelector('img');
-        document.querySelector('img').src = imageUrl;
-        var download = document.querySelector( "a[ download ]" );
-        download.setAttribute( "href", imageUrl );
-        console.log(download);
+        // try to use mechanism from emscripting a c library 
+        let resultPointer = api.getImagePointer();
+        let resultSize = api.getImageSize();
+        console.log("pointer: ", resultPointer);
+        console.log("size: ", resultSize);
+        const resultView = new Uint8Array(Module.HEAP8.buffer, resultPointer, resultSize);
+        console.log(resultView);
 
-        
-        
-        console.log(pngBuffer)
-        console.log(imageUrl);
+
+        //try to just read the file that was written, get blog from it, then load into image via URL 
+        // let pngBuffer = FS.readFile("00000.jpg");
+        // let blob = new Blob([pngBuffer], {type: "image/jpg"})
+        // const imageUrl = URL.createObjectURL(blob);
+        // const img = document.querySelector('img');
+        // document.querySelector('img').src = imageUrl;
+        // var download = document.querySelector( "a[ download ]" );
+        // download.setAttribute( "href", imageUrl );
+        // console.log(download);
+
+        // console.log(pngBuffer)
+        // console.log(imageUrl);
         // img.addEventListener('load', () => URL.revokeObjectURL(imageUrl));
 
         // const canvas = document.createElement('canvas');
@@ -137,3 +148,18 @@
 <a href="javascript:void(0)" download="img.png">
     Download
 </a>
+
+
+
+
+<!-- DEBUG INFO FOR ME :D 
+
+
+
+
+
+-->
+
+<!-- 
+TODO: try the *.o command but with -O3 to see if it gets rid of multiple mains error 
+ -->
