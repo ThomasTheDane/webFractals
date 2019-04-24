@@ -113,13 +113,14 @@ int test(){
    return 41;
 }
 
+flam3_frame f;
+void *image=NULL;
+
 int main(int argc, char **argv) {
-   flam3_frame f;
    char *ai;
    flam3_genome *cps;
    int ncps;
    int i;
-   void *image=NULL;
    FILE *fp;
    char fname[256];
    size_t this_size, last_size = -1;
@@ -130,8 +131,8 @@ int main(int argc, char **argv) {
    randctx savectx;
    char *prefix = args("prefix", "");
    char *out = args("out", NULL);
-   char *format = getenv("format");
-   int verbose = 1; //argi("verbose", 1); //set verbose to 1
+   char *format = "jpg";//getenv("format");
+   int verbose = 99; //argi("verbose", 1); //set verbose to 1
    int bits = argi("bits", 33);
    int bpc = argi("bpc",8);
    int transparency = argi("transparency", 0);
@@ -142,7 +143,7 @@ int main(int argc, char **argv) {
    double pixel_aspect = argf("pixel_aspect", 1.0);
    int sub_batch_size = argi("sub_batch_size",10000);
    int name_enable = argi("name_enable",0);
-   int num_threads = argi("nthreads",0);
+   int num_threads = 1;//argi("nthreads",0); //force set to 1
    int earlyclip = argi("earlyclip",0);
    FILE *in;
    double zoom_scale;
@@ -235,7 +236,7 @@ int main(int argc, char **argv) {
    // "in" is a FILE object 
    // "cps" is a flam3_genome struct 
    // No mention in this file of flam3_defaults_on
-   // ncps is some kind of int pointer but can't tell for what 
+   // ncps is the number of fractals being rendered 
    cps = flam3_parse_from_file(in, inf, flam3_defaults_on, &ncps);
    if (NULL == cps) {
      fprintf(stderr,"error reading genomes from file\n");
@@ -266,19 +267,23 @@ int main(int argc, char **argv) {
       "to one file.  all but last will be lost.\n");
    }
 
-// Now it seems like ncps might not be pointer but instead number of fractals 
+   fprintf(stderr, "number of fractals to render: %d\n", ncps);
+   fprintf(stderr, "bits: %d\n",bits);
+   fprintf(stderr, "pixel aspect ration %f\n", pixel_aspect);
+   fprintf(stderr, "num threads: %d\n", num_threads); //Note that this is 12, which might have been gotten from configure step on local machine (as we do not have this threaded built)
+// Iterate through the fractals being generated 
    for (i = 0; i < ncps; i++) {
       int real_height;
 
       if (verbose && ncps > 1) {
-         fprintf(stderr, "flame = %d/%d ", i+1, ncps);
+         fprintf(stderr, "flame = %d/%d \n", i+1, ncps);
       }
-
+// f is a flame3_frame object 
 //      f.temporal_filter_radius = 0.0; //this was commented out in original 
-      f.genomes = &cps[i];
+      f.genomes = &cps[i]; //grab the genomem from cps, which was gotten from parsing input file or stdin
       f.ngenomes = 1;
       f.verbose = verbose;
-      f.bits = bits;
+      f.bits = bits; //gotten from argi("bits", 33); which i assume means defaults to 33 
       f.time = 0.0;
       f.pixel_aspect_ratio = pixel_aspect;
       f.progress = 0;//print_progress;
@@ -297,6 +302,7 @@ int main(int argc, char **argv) {
       } else {
          nstrips = calc_nstrips(&f);
       }
+      fprintf(stderr, "number of strips: %d\n", nstrips);
 
       if (nstrips > cps[i].height) {
          fprintf(stderr, "cannot have more strips than rows but %d>%d.\n",
@@ -304,8 +310,10 @@ int main(int argc, char **argv) {
          exit(1);
       }
       
+      // setup the amount of memory needed based on channels (3 for png, 4 for jpg (though might be other way around)), width, heigh, and bytes_per_channel (channel defaults to 1 unless set to 2 by argi("bpc",8);)
       imgmem = (double)channels * (double)cps[i].width 
                * (double)cps[i].height * f.bytes_per_channel;
+      fprintf(stderr, "\nimgmem: %f\n", imgmem);
       
       if (imgmem > ULONG_MAX) {
          fprintf(stderr,"Image size > ULONG_MAX.  Aborting.\n");
@@ -314,9 +322,16 @@ int main(int argc, char **argv) {
 
       this_size = (size_t)channels * (size_t)cps[i].width 
                   * (size_t)cps[i].height * f.bytes_per_channel;
+      fprintf(stderr, "this_size: %zu\n", this_size);
+
+      // I bet this checks if you can use the same block of memory for this picture as you did for the last and allocates new block if not so 
       if (this_size != last_size) {
-         if (last_size != -1)
+         fprintf(stderr, "FYI this_size != last_size, meaning your fractals differ in size");
+
+         if (last_size != -1){
             free(image);
+            fprintf(stderr, "just freed image because last_size != -1");
+         }
          last_size = this_size;
          image = (void *) calloc(this_size, sizeof(char));
          if (NULL==image) {
@@ -324,7 +339,7 @@ int main(int argc, char **argv) {
             exit(1);
          }
       } else {
-         memset(image, 0, this_size);
+         memset(image, 0, this_size); //sets a block of memory starting at image and of size this_size 
       }
 
       cps[i].sample_density *= nstrips;
@@ -338,6 +353,7 @@ int main(int argc, char **argv) {
       /* Copy off random context to use for each strip */
       memcpy(&savectx, &f.rc, sizeof(randctx));
 
+      // iterate through strips, though note that nstrips is 1 in test cases 
       for (strip = 0; strip < nstrips; strip++) {
          size_t ssoff = (size_t)cps[i].height * strip * cps[i].width * channels * f.bytes_per_channel;
          void *strip_start = image + ssoff;
@@ -361,7 +377,8 @@ int main(int argc, char **argv) {
             fprintf(stderr, "\n");
          }
          cps[i].ntemporal_samples = 1;
-         if (flam3_render(&f, strip_start, flam3_field_both, channels, transparency, &stats)) {
+         //call that actually goes and renders the strip (which is the whole picture when nstrips = 1)
+         if (flam3_render(&f, strip_start, flam3_field_both, channels, transparency, &stats)) { 
             fprintf(stderr,"error rendering image: aborting.\n");
             exit(1);
          }
@@ -392,11 +409,10 @@ int main(int argc, char **argv) {
          sprintf(rtime_string,"%d",stats.render_seconds);
          fpc.rtime = rtime_string;
 
-         // format = "jpg"; //force set to jpeg 
          if (!strcmp(format, "png")) {
 
              write_png(fp, image, cps[i].width, real_height, &fpc, f.bytes_per_channel);            
-            
+            // fp is the file handle, image is a void *, fpc is flam3 image comments 
          } else if (!strcmp(format, "jpg")) {
                                       
              write_jpeg(fp, (unsigned char *)image, cps[i].width, real_height, &fpc);
@@ -441,6 +457,7 @@ int main(int argc, char **argv) {
    }
    free(cps);
    
-   free(image);
+   free(image); // don't free image O.o sneaky sneaky 
    return 0;
 }
+
