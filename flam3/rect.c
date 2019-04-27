@@ -31,6 +31,7 @@
  * image = filter(accum)
  */
 
+#include <stdio.h>
 
 /* allow this many iterations for settling into attractor */
 #define FUSE_27 15
@@ -251,6 +252,7 @@ static void de_thread(void *dth) {
 }
 
 static void iter_thread(void *fth) {
+   fprintf(stderr, "\nstatic void iter_thread\n");
    double sub_batch;
    int j;
    flam3_thread_helper *fthp = (flam3_thread_helper *)fth;
@@ -528,6 +530,13 @@ static void iter_thread(void *fth) {
 
 static int render_rectangle(flam3_frame *spec, void *out,
 			     int field, int nchan, int transp, stat_struct *stats) {
+
+   fprintf(stderr, "\n Start of render_rectangle \n");
+   fprintf(stderr, "field: %d \n", field);
+   fprintf(stderr, "nchan: %d \n", nchan);
+   fprintf(stderr, "transp: %d \n", transp);
+   
+
    long nbuckets;
    int i, j, k, batch_num, temporal_sample_num;
    double nsamples, batch_size;
@@ -584,7 +593,9 @@ static int render_rectangle(flam3_frame *spec, void *out,
    stats->num_iters = 0;
 
    /* correct for apophysis's use of 255 colors in the palette rather than all 256 */
+   // TOPICKUP: this gets printed in web but not native 
    cmap_size = 256 - argi("apo_palette",0);
+   fprintf(stderr, "cmap_size : %d\n", cmap_size);
 
    memset(&cp,0, sizeof(flam3_genome));
 
@@ -594,6 +605,12 @@ static int render_rectangle(flam3_frame *spec, void *out,
    highpow = cp.highlight_power;
    nbatches = cp.nbatches;
    ntemporal_samples = cp.ntemporal_samples;
+
+   fprintf(stderr, "oversample: %d \n", oversample);
+   fprintf(stderr, "highpow: %f \n", highpow);
+   fprintf(stderr, "nbatches: %d \n", nbatches);
+   fprintf(stderr, "ntemporal_samples: %d \n", ntemporal_samples);
+   
 
    if (nbatches < 1) {
        fprintf(stderr, "nbatches must be positive, not %d.\n", nbatches);
@@ -626,6 +643,8 @@ static int render_rectangle(flam3_frame *spec, void *out,
 
    /* Spatial Filter kernel creation */
    filter_width = flam3_create_spatial_filter(spec, field, &filter);
+   fprintf(stderr, "filter_width: %d \n", filter_width);
+   
    
    /* handle error */
    if (filter_width<0) {
@@ -648,6 +667,7 @@ static int render_rectangle(flam3_frame *spec, void *out,
                                           cp.temporal_filter_width,
                                           &temporal_filter, &temporal_deltas);
                                                                                     
+   fprintf(stderr, "sumfilt: %f \n", sumfilt);
 
    /*
       the number of additional rows of buckets we put at the edge so
@@ -680,15 +700,24 @@ static int render_rectangle(flam3_frame *spec, void *out,
    } else
       de_offset = 0;
 
-
+   fprintf(stderr, "max_gnm_de_fw: %d \n", max_gnm_de_fw);
    /* Allocate the space required to render the image */
    fic.height = oversample * image_height + 2 * gutter_width;
    fic.width  = oversample * image_width  + 2 * gutter_width;
 
    nbuckets = (long)fic.width * (long)fic.height;
+
+   fprintf(stderr, "nbuckets: %ld \n", nbuckets);
+
    memory_rqd = (sizeof(bucket) * nbuckets + sizeof(abucket) * nbuckets +
                  4 * sizeof(double) * (size_t)(spec->sub_batch_size) * spec->nthreads);
+
+   //confirmed the same for native and web 
+   fprintf(stderr, "memory_rqd : %zu\n", memory_rqd);
+
    last_block = (char *) malloc(memory_rqd);
+   fprintf(stderr, "last_block : %s\n", last_block);
+
    if (NULL == last_block) {
       fprintf(stderr, "render_rectangle: cannot malloc %g bytes.\n", (double)memory_rqd);
       fprintf(stderr, "render_rectangle: w=%d h=%d nb=%ld.\n", fic.width, fic.height, nbuckets);
@@ -710,7 +739,10 @@ static int render_rectangle(flam3_frame *spec, void *out,
 
 
    /* Batch loop - outermost */
+   fprintf(stderr, "nbatches : %d\n", nbatches);
    for (batch_num = 0; batch_num < nbatches; batch_num++) {
+      fprintf(stderr, "going through batch num : %d\n", batch_num);
+
       double de_time;
       double sample_density=0.0;
       double k1, area, k2;
@@ -751,6 +783,10 @@ static int render_rectangle(flam3_frame *spec, void *out,
          de.max_filter_index = 0;
       
       /* Temporal sample loop */
+      fprintf(stderr, "start temporal sample loop");
+
+      fprintf(stderr, "ntemporal_samples : %d\n", ntemporal_samples);
+
       for (temporal_sample_num = 0; temporal_sample_num < ntemporal_samples; temporal_sample_num++) {
 
          double temporal_sample_time;
@@ -777,8 +813,11 @@ static int render_rectangle(flam3_frame *spec, void *out,
          /* the input colormap is 256 long with entries from 0 to 1.0 */
          for (j = 0; j < CMAP_SIZE; j++) {
             dmap[j].index = cp.palette[(j * 256) / CMAP_SIZE].index / 256.0;
-            for (k = 0; k < 4; k++)
+            for (k = 0; k < 4; k++){
                dmap[j].color[k] = (cp.palette[(j * 256) / CMAP_SIZE].color[k] * WHITE_LEVEL) * color_scalar;
+               // CONFIRMED working the dmap seems to have the right colors between web and native 
+               fprintf(stderr, "dmap at index %d and color %d is %f\n", j, k, (cp.palette[(j * 256) / CMAP_SIZE].color[k] * WHITE_LEVEL) * color_scalar);
+            }
          }
 
          /* compute camera */
@@ -828,6 +867,8 @@ static int render_rectangle(flam3_frame *spec, void *out,
 
          /* number of samples is based only on the output image size */
          nsamples = sample_density * image_width * image_height;
+         fprintf(stderr, "nsamples : %f\n", nsamples);
+
          
          /* how many of these samples are rendered in this loop? */
          batch_size = nsamples / (nbatches * ntemporal_samples);
@@ -944,6 +985,7 @@ static int render_rectangle(flam3_frame *spec, void *out,
       printf("k1=%f,k2=%15.12f\n",k1,k2);
 #endif
 
+      fprintf(stderr, "de.max_filter_index : %d\n", de.max_filter_index);
       if (de.max_filter_index == 0) {
 
          for (j = 0; j < fic.height; j++) {
@@ -973,7 +1015,8 @@ static int render_rectangle(flam3_frame *spec, void *out,
             }
          }
       } else {
-      
+         fprintf(stderr, "de.max_filter != 0\n");
+
          de_thread_helper *deth;
          int de_aborted=0;
          int myspan = (fic.height-2*(oversample-1)+1);
@@ -981,7 +1024,8 @@ static int render_rectangle(flam3_frame *spec, void *out,
                   
          /* Create the de helper structures */
          deth = (de_thread_helper *)calloc(spec->nthreads,sizeof(de_thread_helper));
-         
+
+         fprintf(stderr, "spec->nthreads : %d\n", spec->nthreads);
          for (thi=0;thi<(spec->nthreads);thi++) {
          
             /* Set up the contents of the helper structure */
@@ -1060,10 +1104,11 @@ static int render_rectangle(flam3_frame *spec, void *out,
 
    if (verbose) {
      fprintf(stderr, "\rchaos: 100.0%%  took: %ld seconds   \n", time(NULL) - progress_began);
-     fprintf(stderr, "filtering...");
+     fprintf(stderr, "filtering...\n");
    }
    
 
+   fprintf(stderr, "starting filter pass \n");
    /* filter the accumulation buffer down into the image */
    if (1) {
       int x, y;
@@ -1084,7 +1129,7 @@ static int render_rectangle(flam3_frame *spec, void *out,
       /* apply the gamma correction and clipping before the spat filt */
       
       if (spec->earlyclip) {
-
+         fprintf(stderr, "spec-> earlyclip is true");
          for (j = 0; j < fic.height; j++) {
             for (i = 0; i < fic.width; i++) {
 
@@ -1126,6 +1171,8 @@ static int render_rectangle(flam3_frame *spec, void *out,
                
                   /* Replace values in accumulation buffer with these new ones */
                   ac[0][rgbi] = a;
+                  fprintf(stderr, "ac[0][%d] : %f\n", rgbi, a);
+
                }
 
                ac[0][3] = alpha;
@@ -1133,7 +1180,6 @@ static int render_rectangle(flam3_frame *spec, void *out,
             }
          }
       }
-
       /* Apply the spatial filter */
       y = de_offset;
       for (j = 0; j < image_height; j++) {
@@ -1158,6 +1204,9 @@ static int render_rectangle(flam3_frame *spec, void *out,
 
                }
             }
+            // BROKEN: this is all 0s in web but not native 
+            fprintf(stderr, "(%d, %d) : t[0] : k * ac[0][0] : %f\n", i, j, t[0]);
+
 
             p = (unsigned char *)out + nchan * bytes_per_channel * (i + j * out_width);
             p8 = (unsigned char *)p;

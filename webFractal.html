@@ -109,17 +109,17 @@
             getImagePointer: Module.cwrap('get_image_pointer', 'number', []),
             getImageSize: Module.cwrap('get_image_size', 'number', [])
         };
-        console.log(api.test());
+        // console.log(api.test());
     };
 
     setTimeout(function () {
         // try to use mechanism from emscripting a c library 
-        let resultPointer = api.getImagePointer();
-        let resultSize = api.getImageSize();
-        console.log("pointer: ", resultPointer);
-        console.log("size: ", resultSize);
-        const resultView = new Uint8Array(Module.HEAP8.buffer, resultPointer, resultSize);
-        console.log(resultView);
+        // let resultPointer = api.getImagePointer();
+        // let resultSize = api.getImageSize();
+        // console.log("pointer: ", resultPointer);
+        // console.log("size: ", resultSize);
+        // const resultView = new Uint8Array(Module.HEAP8.buffer, resultPointer, resultSize);
+        // console.log(resultView);
 
 
         //try to just read the file that was written, get blog from it, then load into image via URL 
@@ -161,5 +161,8 @@
 -->
 
 <!-- 
+Next steps 
+
+
 TODO: try the *.o command but with -O3 to see if it gets rid of multiple mains error 
  -->

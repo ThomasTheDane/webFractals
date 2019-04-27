@@ -183,6 +183,8 @@ int flam3_get_palette(int n, flam3_palette c, double hue_rotation) {
 		         c[i].color[j] = rgb[j];
 		         
 		      c[i].color[3] = 1.0;
+            // confirm it's getting color values in palette, looks like YES 
+            // fprintf(stderr, "c palette value at %d : %f,%f,%f\n", i, c[i].color[0], c[i].color[1], c[i].color[2]);
          }
 	   
 	      return n;
