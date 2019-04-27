@@ -17,7 +17,7 @@ old_library='libflam3.a'
 inherited_linker_flags=' '
 
 # Libraries that this one depends upon.
-dependency_libs=' -ljpeg -lpthread -lxml2 -lpng -lz'
+dependency_libs=' -L/Users/nattestad/workspaces/webFractals/libjpeg/.libs -L/Users/nattestad/workspaces/webFractals/libxml2/.libs /Users/nattestad/workspaces/webFractals/libjpeg/.libs/libjpeg.la /Users/nattestad/workspaces/webFractals/libxml2/.libs/libxml2.la -lpthread -lm -lpng -lz'
 
 # Names of additional weak libraries provided by this library
 weak_library_names=''
@@ -39,3 +39,4 @@ dlpreopen=''
 
 # Directory that this library needs to be installed in:
 libdir='/usr/local/lib'
+relink_command="(cd /Users/nattestad/workspaces/webFractals/flam3; /bin/sh \"/Users/nattestad/workspaces/webFractals/flam3/libtool\"  --tag CC --mode=relink /Users/nattestad/workspaces/emsdk/emscripten/1.38.30/emcc -g -O3 -std=gnu99 -ffast-math -DPACKAGE_DATA_DIR=\\\"/usr/local/share/flam3\\\" -DGIT_REV=\\\"\\\" -no-undefined -ljpeg -lpng -lz -lpthread -s USE_ZLIB=1 -s USE_LIBPNG=1 -L/Users/nattestad/workspaces/webFractals/libjpeg/.libs -L/Users/nattestad/workspaces/webFractals/libxml2/.libs -o libflam3.la -rpath /usr/local/lib flam3.lo filters.lo parser.lo variations.lo interpolation.lo palettes.lo jpeg.lo png.lo isaac.lo -ljpeg -lpthread -lxml2 -lpng -lz @inst_prefix_dir@)"

@@ -1220,11 +1220,11 @@ function updateGlobalBufferViews() {
 
 
 var STATIC_BASE = 1024,
-    STACK_BASE = 228704,
+    STACK_BASE = 228800,
     STACKTOP = STACK_BASE,
-    STACK_MAX = 5471584,
-    DYNAMIC_BASE = 5471584,
-    DYNAMICTOP_PTR = 228448;
+    STACK_MAX = 5471680,
+    DYNAMIC_BASE = 5471680,
+    DYNAMICTOP_PTR = 228544;
 
 assert(STACK_BASE % 16 === 0, 'stack must start aligned');
 assert(DYNAMIC_BASE % 16 === 0, 'heap must start aligned');
@@ -1676,8 +1676,8 @@ Module['asm'] = function(global, env, providedBuffer) {
   ;
   // import table
   env['table'] = wasmTable = new WebAssembly.Table({
-    'initial': 6673,
-    'maximum': 6673,
+    'initial': 6417,
+    'maximum': 6417,
     'element': 'anyfunc'
   });
   env['__memory_base'] = 1024; // tell the memory segments where to place themselves
@@ -1696,7 +1696,7 @@ var ASM_CONSTS = [];
 
 
 
-// STATICTOP = STATIC_BASE + 227680;
+// STATICTOP = STATIC_BASE + 227776;
 /* global initializers */  __ATINIT__.push({ func: function() { ___emscripten_environ_constructor() } });
 
 
@@ -1707,7 +1707,7 @@ var ASM_CONSTS = [];
 
 
 /* no memory initializer */
-var tempDoublePtr = 228688
+var tempDoublePtr = 228784
 assert(tempDoublePtr % 8 == 0);
 
 function copyTempFloat(ptr) { // functions, because inlining this code increases code size too much
@@ -3096,11 +3096,11 @@ function copyTempDouble(ptr) {
   
   var ERRNO_CODES={EPERM:1,ENOENT:2,ESRCH:3,EINTR:4,EIO:5,ENXIO:6,E2BIG:7,ENOEXEC:8,EBADF:9,ECHILD:10,EAGAIN:11,EWOULDBLOCK:11,ENOMEM:12,EACCES:13,EFAULT:14,ENOTBLK:15,EBUSY:16,EEXIST:17,EXDEV:18,ENODEV:19,ENOTDIR:20,EISDIR:21,EINVAL:22,ENFILE:23,EMFILE:24,ENOTTY:25,ETXTBSY:26,EFBIG:27,ENOSPC:28,ESPIPE:29,EROFS:30,EMLINK:31,EPIPE:32,EDOM:33,ERANGE:34,ENOMSG:42,EIDRM:43,ECHRNG:44,EL2NSYNC:45,EL3HLT:46,EL3RST:47,ELNRNG:48,EUNATCH:49,ENOCSI:50,EL2HLT:51,EDEADLK:35,ENOLCK:37,EBADE:52,EBADR:53,EXFULL:54,ENOANO:55,EBADRQC:56,EBADSLT:57,EDEADLOCK:35,EBFONT:59,ENOSTR:60,ENODATA:61,ETIME:62,ENOSR:63,ENONET:64,ENOPKG:65,EREMOTE:66,ENOLINK:67,EADV:68,ESRMNT:69,ECOMM:70,EPROTO:71,EMULTIHOP:72,EDOTDOT:73,EBADMSG:74,ENOTUNIQ:76,EBADFD:77,EREMCHG:78,ELIBACC:79,ELIBBAD:80,ELIBSCN:81,ELIBMAX:82,ELIBEXEC:83,ENOSYS:38,ENOTEMPTY:39,ENAMETOOLONG:36,ELOOP:40,EOPNOTSUPP:95,EPFNOSUPPORT:96,ECONNRESET:104,ENOBUFS:105,EAFNOSUPPORT:97,EPROTOTYPE:91,ENOTSOCK:88,ENOPROTOOPT:92,ESHUTDOWN:108,ECONNREFUSED:111,EADDRINUSE:98,ECONNABORTED:103,ENETUNREACH:101,ENETDOWN:100,ETIMEDOUT:110,EHOSTDOWN:112,EHOSTUNREACH:113,EINPROGRESS:115,EALREADY:114,EDESTADDRREQ:89,EMSGSIZE:90,EPROTONOSUPPORT:93,ESOCKTNOSUPPORT:94,EADDRNOTAVAIL:99,ENETRESET:102,EISCONN:106,ENOTCONN:107,ETOOMANYREFS:109,EUSERS:87,EDQUOT:122,ESTALE:116,ENOTSUP:95,ENOMEDIUM:123,EILSEQ:84,EOVERFLOW:75,ECANCELED:125,ENOTRECOVERABLE:131,EOWNERDEAD:130,ESTRPIPE:86};
   
-  var _stdin=228464;
+  var _stdin=228560;
   
-  var _stdout=228480;
+  var _stdout=228576;
   
-  var _stderr=228496;var FS={root:null,mounts:[],devices:{},streams:[],nextInode:1,nameTable:null,currentPath:"/",initialized:false,ignorePermissions:true,trackingDelegate:{},tracking:{openFlags:{READ:1,WRITE:2}},ErrnoError:null,genericErrors:{},filesystems:null,syncFSRequests:0,handleFSError:function (e) {
+  var _stderr=228592;var FS={root:null,mounts:[],devices:{},streams:[],nextInode:1,nameTable:null,currentPath:"/",initialized:false,ignorePermissions:true,trackingDelegate:{},tracking:{openFlags:{READ:1,WRITE:2}},ErrnoError:null,genericErrors:{},filesystems:null,syncFSRequests:0,handleFSError:function (e) {
         if (!(e instanceof FS.ErrnoError)) throw e + ' : ' + stackTrace();
         return ___setErrNo(e.errno);
       },lookupPath:function (path, opts) {
@@ -6687,20 +6687,6 @@ function copyTempDouble(ptr) {
       return _usleep((seconds * 1e6) + (nanoseconds / 1000));
     }
 
-  function _pthread_attr_destroy(attr) {
-      /* int pthread_attr_destroy(pthread_attr_t *attr); */
-      //FIXME: should destroy the pthread_attr_t struct
-      return 0;
-    }
-
-  function _pthread_attr_init(attr) {
-      /* int pthread_attr_init(pthread_attr_t *attr); */
-      //FIXME: should allocate a pthread_attr_t
-      return 0;
-    }
-
-  function _pthread_attr_setdetachstate() {}
-
   function _pthread_cond_destroy() { return 0; }
 
   function _pthread_cond_init() { return 0; }
@@ -6708,16 +6694,6 @@ function copyTempDouble(ptr) {
   function _pthread_cond_signal() { return 0; }
 
   function _pthread_cond_wait() { return 0; }
-
-  function _pthread_create() {
-      return 11;
-    }
-
-  function _pthread_exit(status) {
-      _exit(status);
-    }
-
-  function _pthread_join() {}
 
    
 
@@ -7022,16 +6998,10 @@ var asmLibraryArg = {
   "_llvm_log10_f64": _llvm_log10_f64,
   "_llvm_trunc_f64": _llvm_trunc_f64,
   "_nanosleep": _nanosleep,
-  "_pthread_attr_destroy": _pthread_attr_destroy,
-  "_pthread_attr_init": _pthread_attr_init,
-  "_pthread_attr_setdetachstate": _pthread_attr_setdetachstate,
   "_pthread_cond_destroy": _pthread_cond_destroy,
   "_pthread_cond_init": _pthread_cond_init,
   "_pthread_cond_signal": _pthread_cond_signal,
   "_pthread_cond_wait": _pthread_cond_wait,
-  "_pthread_create": _pthread_create,
-  "_pthread_exit": _pthread_exit,
-  "_pthread_join": _pthread_join,
   "_sysconf": _sysconf,
   "_time": _time,
   "_usleep": _usleep,

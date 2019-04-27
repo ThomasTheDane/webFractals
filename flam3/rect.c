@@ -216,14 +216,16 @@ static void de_thread(void *dth) {
 
 	        if (rv==1) {
 			   *(dthp->aborted) = 1;
-#ifdef HAVE_LIBPTHREAD
+// #ifdef HAVE_LIBPTHREAD
+#if 0
                pthread_exit((void *)0);
 #else
                return;
 #endif
             }
          } else {
-#ifdef HAVE_LIBPTHREAD
+// #ifdef HAVE_LIBPTHREAD
+#if 0
 
             if (*(dthp->aborted)<0) {
             
@@ -245,7 +247,8 @@ static void de_thread(void *dth) {
 
    }
 
-   #ifdef HAVE_LIBPTHREAD
+   // #ifdef HAVE_LIBPTHREAD
+   #if 0
      pthread_exit((void *)0);
    #endif
 
@@ -367,7 +370,8 @@ static void iter_thread(void *fth) {
                   
             if (rv==1) { /* ABORT */
 				   ficp->aborted = 1;
-#ifdef HAVE_LIBPTHREAD
+// #ifdef HAVE_LIBPTHREAD
+#if 0
                pthread_exit((void *)0);
 #else
                return;
@@ -384,7 +388,8 @@ static void iter_thread(void *fth) {
 #endif
             } while (ficp->aborted==-1);
             }
-#ifdef HAVE_LIBPTHREAD
+// #ifdef HAVE_LIBPTHREAD
+#if 0
             if (ficp->aborted>0) pthread_exit((void *)0);
 #else
             if (ficp->aborted>0) return;
@@ -401,7 +406,8 @@ static void iter_thread(void *fth) {
       /* Execute iterations */
       badcount = flam3_iterate(&(fthp->cp), sub_batch_size, fuse, fthp->iter_storage, ficp->xform_distrib, &(fthp->rc));
 
-      #if defined(HAVE_LIBPTHREAD) && defined(USE_LOCKS)
+      // #if defined(HAVE_LIBPTHREAD) && defined(USE_LOCKS)
+      #if 0
         /* Lock mutex for access to accumulator */
         pthread_mutex_lock(&ficp->bucket_mutex);
       #endif
@@ -517,13 +523,15 @@ static void iter_thread(void *fth) {
          }
       }
       
-      #if defined(HAVE_LIBPTHREAD) && defined(USE_LOCKS)
+      // #if defined(HAVE_LIBPTHREAD) && defined(USE_LOCKS)
+      #if 0
         /* Release mutex */
         pthread_mutex_unlock(&ficp->bucket_mutex);
       #endif
 
    }
-   #ifdef HAVE_LIBPTHREAD
+   // #ifdef HAVE_LIBPTHREAD
+   #if 0
      pthread_exit((void *)0);
    #endif
 }
@@ -566,7 +574,8 @@ static int render_rectangle(flam3_frame *spec, void *out,
    unsigned short *xform_distrib;
    flam3_iter_constants fic;
    flam3_thread_helper *fth;
-#ifdef HAVE_LIBPTHREAD
+// #ifdef HAVE_LIBPTHREAD
+#if 0
    pthread_attr_t pt_attr;
    pthread_t *myThreads=NULL;
 #endif
@@ -924,7 +933,8 @@ static int render_rectangle(flam3_frame *spec, void *out,
 
          }
 
-#ifdef HAVE_LIBPTHREAD
+// #ifdef HAVE_LIBPTHREAD
+#if 0
          /* Let's make some threads */
          myThreads = (pthread_t *)malloc(spec->nthreads * sizeof(pthread_t));
 
@@ -1082,7 +1092,8 @@ static int render_rectangle(flam3_frame *spec, void *out,
       fprintf(stderr, "\nright before threads section\n");
 
 //TOPICKUP: We now know that this threads section is the problem. config.h thinks I have threads but I don't. But it also doesn't work if I force it into no threads mode 
-#ifdef HAVE_LIBPTHREAD
+// #ifdef HAVE_LIBPTHREAD
+#if 0
          fprintf(stderr, "HAVE LIBPTHREAD\n");
          /* Let's make some threads */
          myThreads = (pthread_t *)malloc(spec->nthreads * sizeof(pthread_t));

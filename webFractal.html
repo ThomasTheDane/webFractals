@@ -123,14 +123,14 @@
 
 
         //try to just read the file that was written, get blog from it, then load into image via URL 
-        // let pngBuffer = FS.readFile("00000.jpg");
-        // let blob = new Blob([pngBuffer], {type: "image/jpg"})
-        // const imageUrl = URL.createObjectURL(blob);
-        // const img = document.querySelector('img');
-        // document.querySelector('img').src = imageUrl;
-        // var download = document.querySelector( "a[ download ]" );
-        // download.setAttribute( "href", imageUrl );
-        // console.log(download);
+        let pngBuffer = FS.readFile("00000.jpg");
+        let blob = new Blob([pngBuffer], {type: "image/jpg"})
+        const imageUrl = URL.createObjectURL(blob);
+        const img = document.querySelector('img');
+        document.querySelector('img').src = imageUrl;
+        var download = document.querySelector( "a[ download ]" );
+        download.setAttribute( "href", imageUrl );
+        console.log(download);
 
         // console.log(pngBuffer)
         // console.log(imageUrl);
