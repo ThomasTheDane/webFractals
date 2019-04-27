@@ -783,7 +783,7 @@ static int render_rectangle(flam3_frame *spec, void *out,
          de.max_filter_index = 0;
       
       /* Temporal sample loop */
-      fprintf(stderr, "start temporal sample loop");
+      fprintf(stderr, "start temporal sample loop\n");
 
       fprintf(stderr, "ntemporal_samples : %d\n", ntemporal_samples);
 
@@ -816,7 +816,7 @@ static int render_rectangle(flam3_frame *spec, void *out,
             for (k = 0; k < 4; k++){
                dmap[j].color[k] = (cp.palette[(j * 256) / CMAP_SIZE].color[k] * WHITE_LEVEL) * color_scalar;
                // CONFIRMED working the dmap seems to have the right colors between web and native 
-               fprintf(stderr, "dmap at index %d and color %d is %f\n", j, k, (cp.palette[(j * 256) / CMAP_SIZE].color[k] * WHITE_LEVEL) * color_scalar);
+               // fprintf(stderr, "dmap at index %d and color %d is %f\n", j, k, (cp.palette[(j * 256) / CMAP_SIZE].color[k] * WHITE_LEVEL) * color_scalar);
             }
          }
 
@@ -1026,11 +1026,21 @@ static int render_rectangle(flam3_frame *spec, void *out,
          deth = (de_thread_helper *)calloc(spec->nthreads,sizeof(de_thread_helper));
 
          fprintf(stderr, "spec->nthreads : %d\n", spec->nthreads);
+         fprintf(stderr, "About to start threads loop\n");
          for (thi=0;thi<(spec->nthreads);thi++) {
-         
+
+            fprintf(stderr, "thi index : %d\n", thi);
             /* Set up the contents of the helper structure */
             deth[thi].b = buckets;
             deth[thi].accumulate = accumulate;
+
+            // for (j = 0; j < fic.height; j++) {
+            //    for (i = 0; i < fic.width; i++) {
+            //       abucket *ac = accumulate + i + j*fic.width;
+            //       fprintf(stderr,"(%d, %d) : %f\n", i, j, (double)ac[0][0]);
+            //    }
+            // }
+            
             deth[thi].width = fic.width;
             deth[thi].height = fic.height;
             deth[thi].oversample = oversample;
@@ -1062,7 +1072,18 @@ static int render_rectangle(flam3_frame *spec, void *out,
             }
          }
 
+         fprintf(stderr, "\n START PRE THREADS SECTION \n");
+         for (j = 0; j < fic.height; j += 50) {
+            for (i = 0; i < fic.width/10; i += 50) {
+               abucket *ac = accumulate + i + j*fic.width;
+               fprintf(stderr,"(%d, %d) : %f\n", i, j, (double)ac[0][0]);
+            }
+         }
+      fprintf(stderr, "\nright before threads section\n");
+
+//TOPICKUP: We now know that this threads section is the problem. config.h thinks I have threads but I don't. But it also doesn't work if I force it into no threads mode 
 #ifdef HAVE_LIBPTHREAD
+         fprintf(stderr, "HAVE LIBPTHREAD\n");
          /* Let's make some threads */
          myThreads = (pthread_t *)malloc(spec->nthreads * sizeof(pthread_t));
 
@@ -1078,11 +1099,13 @@ static int render_rectangle(flam3_frame *spec, void *out,
          for (thi=0; thi < spec->nthreads; thi++)
             pthread_join(myThreads[thi], NULL);
          
-         free(myThreads);            
+         free(myThreads);
 #else         
+         fprintf(stderr, "DO NOT HAVE LIBPTHREAD\n");
          for (thi=0; thi <spec->nthreads; thi ++)
             de_thread((void *)(&(deth[thi])));
 #endif
+      fprintf(stderr, "DID YOU SEE LIBPTHREAD MESSAGE???\n");
 
          free(deth);
                   
@@ -1101,6 +1124,14 @@ static int render_rectangle(flam3_frame *spec, void *out,
       }
 
    }
+   fprintf(stderr, "\n START POST THREADS SECTION \n");
+   for (j = 0; j < fic.height; j += 50) {
+      for (i = 0; i < fic.width/10; i += 50) {
+         abucket *ac = accumulate + i + j*fic.width;
+         fprintf(stderr,"(%d, %d) : %f\n", i, j, (double)ac[0][0]);
+      }
+   }
+   fprintf(stderr,"Post threads section accumulate : %f\n", (double)accumulate[0][0]);
 
    if (verbose) {
      fprintf(stderr, "\rchaos: 100.0%%  took: %ld seconds   \n", time(NULL) - progress_began);
@@ -1150,6 +1181,8 @@ static int render_rectangle(flam3_frame *spec, void *out,
                t[1] = (double)ac[0][1];
                t[2] = (double)ac[0][2];
                t[3] = (double)ac[0][3];
+               // would be broken if we got through earlyclip if statement 
+               // fprintf(stderr, "(%d, %d) : t[0] : k * ac[0][0] : %f\n", i, j, t[0]);
             
                flam3_calc_newrgb(t, ls, highpow, newrgb);
                   
@@ -1171,7 +1204,6 @@ static int render_rectangle(flam3_frame *spec, void *out,
                
                   /* Replace values in accumulation buffer with these new ones */
                   ac[0][rgbi] = a;
-                  fprintf(stderr, "ac[0][%d] : %f\n", rgbi, a);
 
                }
 
@@ -1204,8 +1236,8 @@ static int render_rectangle(flam3_frame *spec, void *out,
 
                }
             }
-            // BROKEN: this is all 0s in web but not native 
-            fprintf(stderr, "(%d, %d) : t[0] : k * ac[0][0] : %f\n", i, j, t[0]);
+            // CONFIRMED BROKEN: this is all 0s in web but not native 
+            // fprintf(stderr, "(%d, %d) : t[0] : k * ac[0][0] : %f\n", i, j, t[0]);
 
 
             p = (unsigned char *)out + nchan * bytes_per_channel * (i + j * out_width);
