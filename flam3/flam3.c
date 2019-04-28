@@ -3898,20 +3898,20 @@ int flam3_render(flam3_frame *spec, void *out,
   
   if (spec->nthreads <= 2) {
     /* single-threaded or 2 threads without atomic operations */
-    fprintf(stderr, "confirmed single or double threaded\n");
+   //  fprintf(stderr, "confirmed single or double threaded\n");
     switch (spec->bits) {
     case 32:
-      fprintf(stderr, "render_rectangle_int\n");
+      // fprintf(stderr, "render_rectangle_int\n");
       retval = render_rectangle_int(spec, out, field, nchan, trans, stats);
       return(retval);
     case 33:
-      fprintf(stderr, "render_rectangle_float\n");
+      // fprintf(stderr, "render_rectangle_float\n");
       retval = render_rectangle_float(spec, out, field, nchan, trans, stats);
-      fprintf(stderr, "retval from render_rectangle_float : %d\n", retval);
+      // fprintf(stderr, "retval from render_rectangle_float : %d\n", retval);
 
       return(retval);
     case 64:
-      fprintf(stderr, "render_rectangle_double\n");
+      // fprintf(stderr, "render_rectangle_double\n");
       retval = render_rectangle_double(spec, out, field, nchan, trans, stats);
       return(retval);
     default:

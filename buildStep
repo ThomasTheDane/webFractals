@@ -1,8 +1,9 @@
 
 make clean;
 LDFLAGS='-s USE_ZLIB=1 -s USE_LIBPNG=1 -L/Users/nattestad/workspaces/webFractals/libjpeg/.libs -L/Users/nattestad/workspaces/webFractals/libxml2/.libs' CPPFLAGS='-I/Users/nattestad/workspaces/webFractals/libjpeg -s USE_LIBPNG=1' emconfigure ./configure 
+make clean;
 emmake make; 
-emcc  -s EXTRA_EXPORTED_RUNTIME_METHODS='["cwrap"]' \
+emcc -O3 -s EXTRA_EXPORTED_RUNTIME_METHODS='["cwrap"]' \
 /Users/nattestad/workspaces/webFractals/flam3/flam3-render.o \
 /Users/nattestad/workspaces/webFractals/flam3/flam3.o \
 /Users/nattestad/workspaces/webFractals/flam3/interpolation.o \
@@ -91,6 +92,12 @@ emcc  -s EXTRA_EXPORTED_RUNTIME_METHODS='["cwrap"]' \
 
 
 
+ATTEMPT AT A BETTER LIFE: 
+emcc -O3 -s EXTRA_EXPORTED_RUNTIME_METHODS='["cwrap"]' \
+/Users/nattestad/workspaces/webFractals/flam3/*.o \
+/Users/nattestad/workspaces/webFractals/libjpeg/*.o \
+/Users/nattestad/workspaces/webFractals/libxml2/*.o \
+-o flam3-render.js -s USE_LIBPNG=1 -I/Users/nattestad/workspaces/webFractals/libjpeg -s ALLOW_MEMORY_GROWTH=1
 
 
 
@@ -98,3 +105,5 @@ PROBLEM CHILDREN:
 
 /Users/nattestad/workspaces/webFractals/libxml2/xmllint.o \
 /Users/nattestad/workspaces/webFractals/libxml2/xmlcatalog.o \
+
+

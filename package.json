@@ -1,0 +1,23 @@
+{
+  "name": "webfractals",
+  "version": "1.0.0",
+  "description": "Fractals on the web!",
+  "main": "index.js",
+  "dependencies": {
+    "xml-js": "^1.6.11"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ThomasTheDane/webFractals.git"
+  },
+  "author": "Thomas Nattestad",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ThomasTheDane/webFractals/issues"
+  },
+  "homepage": "https://github.com/ThomasTheDane/webFractals#readme"
+}

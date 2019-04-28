@@ -16,7 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-// #include "emscripten.h"
+#include "emscripten.h"
 
 #ifdef WIN32
 #define WINVER 0x0500
@@ -117,7 +117,7 @@ int print_progress(void *foo, double fraction, int stage, double eta)
    return 0;
 }
 
-// EMSCRIPTEN_KEEPALIVE
+EMSCRIPTEN_KEEPALIVE
 int test()
 {
    return 41;
@@ -143,7 +143,7 @@ int main(int argc, char **argv)
    char *prefix = args("prefix", "");
    char *out = args("out", NULL);
    char *format = "jpg"; //getenv("format");
-   int verbose = 99;     //argi("verbose", 1); //set verbose to 1
+   int verbose = 0;     //argi("verbose", 1); //set verbose to 0
    int bits = argi("bits", 33);
    int bpc = argi("bpc", 8);
    int transparency = argi("transparency", 0);
@@ -260,8 +260,8 @@ int main(int argc, char **argv)
    // ncps is the number of fractals being rendered
    cps = flam3_parse_from_file(in, inf, flam3_defaults_on, &ncps);
 
-   fprintf(stderr, "\n Start palett print \n");
-   fprintf(stderr, "bits: %d\n", bits);
+   // fprintf(stderr, "\n Start palett print \n");
+   // fprintf(stderr, "bits: %d\n", bits);
 
    if (NULL == cps)
    {
@@ -296,10 +296,10 @@ int main(int argc, char **argv)
                       "to one file.  all but last will be lost.\n");
    }
 
-   fprintf(stderr, "number of fractals to render: %d\n", ncps);
-   fprintf(stderr, "bits: %d\n", bits);
-   fprintf(stderr, "pixel aspect ration %f\n", pixel_aspect);
-   fprintf(stderr, "num threads: %d\n", num_threads); //Note that this is 12, which might have been gotten from configure step on local machine (as we do not have this threaded built)
+   // fprintf(stderr, "number of fractals to render: %d\n", ncps);
+   // fprintf(stderr, "bits: %d\n", bits);
+   // fprintf(stderr, "pixel aspect ration %f\n", pixel_aspect);
+   // fprintf(stderr, "num threads: %d\n", num_threads); //Note that this is 12, which might have been gotten from configure step on local machine (as we do not have this threaded built)
                                                       // Iterate through the fractals being generated
    for (i = 0; i < ncps; i++)
    {
@@ -335,7 +335,7 @@ int main(int argc, char **argv)
       {
          nstrips = calc_nstrips(&f);
       }
-      fprintf(stderr, "number of strips: %d\n", nstrips);
+      // fprintf(stderr, "number of strips: %d\n", nstrips);
 
       if (nstrips > cps[i].height)
       {
@@ -346,7 +346,7 @@ int main(int argc, char **argv)
 
       // setup the amount of memory needed based on channels (3 for png, 4 for jpg (though might be other way around)), width, heigh, and bytes_per_channel (channel defaults to 1 unless set to 2 by argi("bpc",8);)
       imgmem = (double)channels * (double)cps[i].width * (double)cps[i].height * f.bytes_per_channel;
-      fprintf(stderr, "\nimgmem: %f\n", imgmem);
+      // fprintf(stderr, "\nimgmem: %f\n", imgmem);
 
       if (imgmem > ULONG_MAX)
       {
@@ -355,12 +355,12 @@ int main(int argc, char **argv)
       }
 
       this_size = (size_t)channels * (size_t)cps[i].width * (size_t)cps[i].height * f.bytes_per_channel;
-      fprintf(stderr, "this_size: %zu\n", this_size);
+      // fprintf(stderr, "this_size: %zu\n", this_size);
 
       // I bet this checks if you can use the same block of memory for this picture as you did for the last and allocates new block if not so
       if (this_size != last_size)
       {
-         fprintf(stderr, "FYI this_size != last_size, meaning your fractals differ in size");
+         // fprintf(stderr, "FYI this_size != last_size, meaning your fractals differ in size");
 
          if (last_size != -1)
          {
@@ -421,19 +421,19 @@ int main(int argc, char **argv)
          cps[i].ntemporal_samples = 1;
 
          // lets add some print statements!
-         fprintf(stderr, "\n Start debug info \n\n");
+         // fprintf(stderr, "\n Start debug info \n\n");
 
-         fprintf(stderr, "nstrips : %d \n", nstrips);
+         // fprintf(stderr, "nstrips : %d \n", nstrips);
 
-         fprintf(stderr, "genomes.num_xforms : %d\n", f.genomes->num_xforms);
-         fprintf(stderr, "genomes.genome_index : %d\n", f.genomes->genome_index);
-         fprintf(stderr, "genomes.palette_index : %d\n", f.genomes->palette_index);
-         fprintf(stderr, "genomes.width : %d\n", f.genomes->width);
-         fprintf(stderr, "genomes.sample_density : %f\n", f.genomes->sample_density);
-         fprintf(stderr, "genomes.contrast : %f\n", f.genomes->contrast);
-         fprintf(stderr, "genomes.gamma : %f\n", f.genomes->gamma);
+         // fprintf(stderr, "genomes.num_xforms : %d\n", f.genomes->num_xforms);
+         // fprintf(stderr, "genomes.genome_index : %d\n", f.genomes->genome_index);
+         // fprintf(stderr, "genomes.palette_index : %d\n", f.genomes->palette_index);
+         // fprintf(stderr, "genomes.width : %d\n", f.genomes->width);
+         // fprintf(stderr, "genomes.sample_density : %f\n", f.genomes->sample_density);
+         // fprintf(stderr, "genomes.contrast : %f\n", f.genomes->contrast);
+         // fprintf(stderr, "genomes.gamma : %f\n", f.genomes->gamma);
          
-         //call that actually goes and renders the strip (which is the whole picture when nstrips = 1)
+         // //call that actually goes and renders the strip (which is the whole picture when nstrips = 1)
          if (flam3_render(&f, strip_start, flam3_field_both, channels, transparency, &stats))
          {
             fprintf(stderr, "error rendering image: aborting.\n");
@@ -441,11 +441,11 @@ int main(int argc, char **argv)
          }
 
          // want to inspect the output a bit immediately, looks like data at this point is 0 for web but not for native, progress!
-         for (int xi = 0; xi < 80; xi += 8)
-         {
-            fprintf(stderr, "data at mem index %ld: %ld\n", ((long)strip_start) + xi, *(((long *)strip_start) + xi));
-         }
-         fprintf(stderr, "\n end debug info\n\n");
+         // for (int xi = 0; xi < 80; xi += 8)
+         // {
+         //    fprintf(stderr, "data at mem index %ld: %ld\n", ((long)strip_start) + xi, *(((long *)strip_start) + xi));
+         // }
+         // fprintf(stderr, "\n end debug info\n\n");
 
          if (NULL != out)
          {
@@ -535,17 +535,17 @@ int main(int argc, char **argv)
    }
    free(cps);
 
-   // free(image); // maybe don't free image O.o sneaky sneaky
+   free(image); // maybe don't free image O.o sneaky sneaky
    return 0;
 }
 
-// EMSCRIPTEN_KEEPALIVE
+EMSCRIPTEN_KEEPALIVE
 int get_image_pointer()
 {
    return (int)image;
 }
 
-// EMSCRIPTEN_KEEPALIVE
+EMSCRIPTEN_KEEPALIVE
 int get_image_size()
 {
    return (int)this_size;

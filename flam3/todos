@@ -1,0 +1,13 @@
+✓ Get it building 
+✓ Get it rendering on the page 
+✓ Get it showing a public flame
+Get the files passed in better 
+Public flames come with their own color information, get it to use those instead of palett
+Setup passing of more variables into flame 
+Learn how to pass in env / option variables 
+Make an editor for the fractal 
+Learn to use pthreads and re-eanble the pthreads code in rect.c 
+Get it building easily and prettily 
+    try the *.o command but with -O3 to see if it gets rid of multiple mains error 
+
+
