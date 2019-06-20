@@ -1,0 +1,33 @@
+div{
+    /* border: 1px red solid; */
+}
+
+html, body{
+    height: 100%;
+    margin: 0;
+}
+
+#fractalInputHolder{
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+#fractalInput{
+    width: 100%;
+    height: 80%
+}
+
+#fractalOutputHolder{
+    height: 100%;
+}
+
+#fractalOutput{
+    height: 100%;
+    display:block;
+    margin:auto;
+}
+
+#renderButton{
+    margin: 5px;
+}

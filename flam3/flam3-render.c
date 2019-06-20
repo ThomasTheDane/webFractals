@@ -127,6 +127,8 @@ flam3_frame f;
 void *image = NULL;
 size_t this_size, last_size = -1;
 
+double qs = 1.0;
+
 int main(int argc, char **argv)
 {
    char *ai;
@@ -149,7 +151,6 @@ int main(int argc, char **argv)
    int transparency = argi("transparency", 0);
    // char *inf = getenv("in");
    char *inf = "test.flam3"; // replace getting file input with just passing file name we create on js side
-   double qs = argf("qs", 1.0);
    double ss = argf("ss", 1.0);
    double pixel_aspect = argf("pixel_aspect", 1.0);
    int sub_batch_size = argi("sub_batch_size", 10000);
@@ -549,4 +550,9 @@ EMSCRIPTEN_KEEPALIVE
 int get_image_size()
 {
    return (int)this_size;
+}
+
+EMSCRIPTEN_KEEPALIVE
+void set_quality(double quality){
+   qs = quality;
 }
