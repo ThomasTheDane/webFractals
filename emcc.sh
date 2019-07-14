@@ -6,7 +6,7 @@ cd flam3
 echo "============================================="
 echo "emcc step"
 echo "============================================="
-emcc -O3 -s EXTRA_EXPORTED_RUNTIME_METHODS='["cwrap"]' \
+emcc -O3 -s EXTRA_EXPORTED_RUNTIME_METHODS='["cwrap", "FS"]' \
 -s INVOKE_RUN=0 \
 -g4 \
 --bind \
@@ -100,12 +100,13 @@ emcc -O3 -s EXTRA_EXPORTED_RUNTIME_METHODS='["cwrap"]' \
 /Users/nattestad/workspaces/webFractals/libxml2/xmlregexp.o \
 /Users/nattestad/workspaces/webFractals/libxml2/xmlIO.o \
 /Users/nattestad/workspaces/webFractals/libxml2/xlink.o \
-# -s MODULARIZE=1 \
-# -s EXPORT_ES6=1 \
+-s MODULARIZE=1 \
+-s EXPORT_ES6=1 \
 
 
-# Create output folder
-cd ..
-mkdir -p dist
-# Move artifacts
-mv flam3/flam3-render.{js,wasm} dist
+
+# # Create output folder
+# cd ..
+# mkdir -p dist
+# # Move artifacts
+# mv flam3/flam3-render.{js,wasm} dist
