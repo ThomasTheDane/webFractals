@@ -1,0 +1,9 @@
+Todos:
+Want to put computation in a worker 
+Make it so I don't have to initialize module each render 
+Plug into more controls of the fractal editing 
+Making a UI editor for the fractal paramters 
+Make a saving system 
+
+Things to look up: 
+WebWorkers 

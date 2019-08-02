@@ -7,7 +7,6 @@ window.onload = function () {
         const instance = wasmModule({
             onRuntimeInitialized() {
 
-
                 let api = {
                     test: instance.cwrap('test', 'number', []),
                     getImagePointer: instance.cwrap('get_image_pointer', 'number', []),
